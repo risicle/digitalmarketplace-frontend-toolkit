@@ -6,5 +6,5 @@ examples:
     title: Search summary
     content: >
       <span class="search-summary-count">34</span>
-      services found in <strong>Software as a Service</strong>, under the categories <strong>Accounting and finance</strong> and <strong>Collaboration</strong>,
-      with a minimum contract period of an <strong>Hour</strong> or a <strong>Day</strong>
+      services found in <em>Software as a Service</em>, under the categories <em>Accounting and finance</em> and <em>Collaboration</em>,
+      with a minimum contract period of an <em>Hour</em> or a <em>Day</em>
