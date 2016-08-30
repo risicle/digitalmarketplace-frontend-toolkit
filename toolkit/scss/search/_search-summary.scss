@@ -1,8 +1,12 @@
 @import "_typography.scss";
 @import "_measurements.scss";
+@import "_colours.scss";
 
 .search-summary {
   @include core-14;
+  padding: 0 0 $gutter-half;
+  margin: 0 0 $gutter-half;
+  border-bottom: 1px solid $border-colour;
 
   @include media(tablet) {
     @include core-16;
