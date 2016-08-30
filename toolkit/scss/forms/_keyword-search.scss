@@ -2,10 +2,20 @@
 @import "_css3.scss";
 @import "_colours.scss";
 
-.govuk-option-select .filter-field-text {
-  @include core-16;
-  @include box-sizing(border-box);
-  width: 100%;
-  padding: 5px;
-  border: 1px solid $border-colour;
+.option-select-label {
+  display: block;
+}
+
+.filter-field-text {
+  .js-enabled & {
+    padding: 5px;
+  }
+
+  input {
+    @include core-16;
+    @include box-sizing(border-box);
+    width: 100%;
+    padding: 5px;
+    border: 1px solid $border-colour;
+  }
 }
