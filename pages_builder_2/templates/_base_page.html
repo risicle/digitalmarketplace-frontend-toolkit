@@ -1,0 +1,27 @@
+{% extends "govuk_template/views/layouts/govuk_template.html" %}
+
+{% block head %}
+  {% include "includes/_stylesheets.html" %}
+{% endblock %}
+
+{% block cookie_message %}{% endblock %}
+
+{% block header_class %}with-proposition{% endblock %}
+
+{% block proposition_header %}
+  {% include "includes/_proposition_header.html" %}
+{% endblock %}
+
+{% block content %}
+  {% block breadcrumb %}{% endblock %}
+  <div id="wrapper">
+    <main id="content" role="main">
+      {% block main_content %}
+      {% endblock %}
+    </main>
+  </div>
+{% endblock %}
+
+{% block body_end %}
+  {% include "includes/_javascripts.html" %}
+{% endblock %}
