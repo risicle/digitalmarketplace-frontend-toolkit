@@ -1,7 +1,9 @@
 import os
+import re
 from shutil import copytree, rmtree, ignore_patterns
 from jinja2 import Environment, FileSystemLoader
 from dmutils.filters import markdown_filter
+from tree import Tree
 
 
 class Structure(object):
@@ -24,14 +26,19 @@ class Structure(object):
         self.dst = os.path.join(root, dst_dir)
         self.template_env = self._set_template_env()
 
-    def resources_to_ignore(self, as_paths=False):
+    def resources_to_ignore(self, as_paths=False, as_regexes=False):
         resources = [
             (self.src, 'tools'),
-            (self.src, 'templates')
+            (self.src, 'templates'),
+            (self.src, 'govuk_template')
         ]
         if as_paths is True:
             return [
                 os.path.join(resource[0], resource[1])
+                for resource in resources]
+        elif as_regexes is True:
+            return [
+                re.compile(os.path.join(resource[0], resource[1]))
                 for resource in resources]
         else:
             return resources
@@ -48,3 +55,20 @@ class Structure(object):
             shutil.rmtree(self.dst)
 
         copytree(self.src, self.dst, ignore=self._filter)
+
+    def render_pages(self):
+        paths_to_ignore = self.resources_to_ignore(as_regexes=True)
+        tree = Tree(paths_to_ignore)
+
+        def allow_path(path):
+            for pattern in paths_to_ignore:
+                if pattern.match(path) is not None:
+                    return False
+            return True
+
+        for root, dirs, files in os.walk(self.src):
+            if allow_path(root):
+                print('root before: {}'.format(root))
+                print('root after: {}'.format(root.replace(self.src, '')))
+                tree.add(root.replace(self.src, ''), dirs, files)
+            return tree

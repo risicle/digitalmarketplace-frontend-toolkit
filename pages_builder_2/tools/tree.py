@@ -1,7 +1,8 @@
 class Tree(object):
     """Reads and holds information on a patterns directory structure"""
-    def __init__(self):
+    def __init__(self, paths_to_ignore):
         self._tree = {}
+        self.paths_to_ignore = paths_to_ignore
 
     def get_node(self, steps):
         current_node = self._tree
@@ -13,24 +14,26 @@ class Tree(object):
         return current_node
 
     def add(self, path, dirs=[], files=[]):
+        def allow_path(path):
+            for pattern in self.paths_to_ignore:
+                if pattern.match(path) is not None:
+                    return False
+            return True
+
+        # adding the root node
+        if path == '':
+            self._tree = {dir: {} for dir in dirs if allow_path(dir)}
+            return
+
         steps = path.split('/')
-        if len(steps) == 1:
-            self._tree[steps[0]] = {}
-            node = self._tree[steps[0]]
-        else:
-            node = self.get_node(steps)
-        # node is pattern
-        if 'examples' in dirs:
-            node['type'] = 'pattern'
-            node['examples'] = []
-        # node is examples dir in a pattern
-        elif steps[-1] == 'examples':
-            node += files
-        # node is section
-        else:
-            node['type'] = 'section'
+        node = self.get_node(steps)
+        node['files'] = files
+        if len(dirs) > 0:
             # create child nodes for each directory in this node
-            node['children'] = {dir: {} for dir in dirs}
+            node['children'] = {dir: {} for dir in dirs if allow_path(dir)}
 
     def get(self, path):
-        return self.get_node(path.split('/'))
+        if len(path) > 0:
+            return self.get_node(path.split('/'))
+        else:
+            return self._tree

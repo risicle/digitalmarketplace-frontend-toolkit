@@ -15,22 +15,38 @@ def _clean(folders):
             shutil.rmtree(dir)
 
 class TestTree(object):
-    tree = tree.Tree()
+    tree = tree.Tree([])
+
+    def test_adding_the_root_dir(self):
+        self.tree.add(
+            '',
+            dirs=['node_1', 'node_2'],
+            files=[])
+        assert self.tree.get('') == {
+            'node_1' : {},
+            'node_2' : {}
+        }
 
     def test_adding_a_pattern_dir(self):
         level_1_node_1_examples = os.path.join('node_1', 'examples')
         self.tree.add(
             'node_1',
-            dirs=['examples'])
+            dirs=['examples'],
+            files=[])
         self.tree.add(
             level_1_node_1_examples,
+            dirs=[],
             files=['example_1.html', 'example_2.html'])
         assert self.tree.get('node_1') == {
-            'type' : 'pattern',
-            'examples' : [
-                'example_1.html',
-                'example_2.html'
-            ]
+            'children' : {
+                'examples' : {
+                    'files' : [
+                        'example_1.html',
+                        'example_2.html'
+                    ]
+                }
+            },
+            'files' : []
         }
 
     def test_adding_a_section_dir(self):
@@ -40,38 +56,51 @@ class TestTree(object):
         level_2_node_2_examples = os.path.join( 'node_2', 'node_2', 'examples')
         self.tree.add(
             'node_2',
-            dirs=['node_1', 'node_2'])
+            dirs=['node_1', 'node_2'],
+            files=[])
         self.tree.add(
             level_2_node_1,
-            dirs=['examples'])
+            dirs=['examples'],
+            files=[])
         self.tree.add(
             level_2_node_2,
-            dirs=['examples'])
+            dirs=['examples'],
+            files=[])
         self.tree.add(
             level_2_node_1_examples,
+            dirs=[],
             files=['example_1.html', 'example_2.html'])
         self.tree.add(
             level_2_node_2_examples,
+            dirs=[],
             files=['example_1.html', 'example_2.html', 'example_3.html'])
         assert self.tree.get('node_2') == {
-            'type': 'section',
             'children': {
                 'node_1' : {
-                    'type': 'pattern',
-                    'examples': [
-                        'example_1.html',
-                        'example_2.html'
-                    ]
+                    'children' : {
+                        'examples': {
+                            'files': [
+                                'example_1.html',
+                                'example_2.html'
+                            ]
+                        }
+                    },
+                    'files' : []
                 },
                 'node_2' : {
-                    'type': 'pattern',
-                    'examples': [
-                        'example_1.html',
-                        'example_2.html',
-                        'example_3.html'
-                    ]
+                    'children' : {
+                        'examples' :  {
+                            'files': [
+                                'example_1.html',
+                                'example_2.html',
+                                'example_3.html'
+                            ]
+                        }
+                    },
+                    'files' : []
                 }
-            }
+            },
+            'files' : []
         }
 
 
