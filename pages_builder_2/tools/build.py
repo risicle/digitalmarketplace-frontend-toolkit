@@ -25,50 +25,32 @@ class Structure(object):
         self.src = os.path.join(root, src_dir)
         self.dst = os.path.join(root, dst_dir)
         self.template_env = self._set_template_env()
+        self.tree = self.get_tree(self)
 
-    def resources_to_ignore(self, as_paths=False, as_regexes=False):
-        resources = [
-            (self.src, 'tools'),
-            (self.src, 'templates'),
-            (self.src, 'govuk_template')
-        ]
-        if as_paths is True:
-            return [
-                os.path.join(resource[0], resource[1])
-                for resource in resources]
-        elif as_regexes is True:
-            return [
-                re.compile(os.path.join(resource[0], resource[1]))
-                for resource in resources]
-        else:
-            return resources
+    def get_tree(self):
+        for root, dirs, files in os.walk(self.src):
+            print('root before: {}'.format(root))
+            print('root after: {}'.format(root.replace(self.src, '')))
+            tree.add(root.replace(self.src, ''), dirs, files)
+        return tree
 
-    def _filter(self, dir, contents):
-        filter_out = []
-        for file in self.resources_to_ignore():
-            if dir is file[0] and file[1] in contents:
-                filter_out.append(file[1])
-        return filter_out
+    def get_format(node):
+        if 'children' in node:
+           return Index(node)
+        elif 'examples' in node:
+           return Pattern(node)
+        return false
 
-    def create_tree(self):
+    def create_pages(self):
         if os.path.exists(self.dst):
             shutil.rmtree(self.dst)
 
-        copytree(self.src, self.dst, ignore=self._filter)
-
-    def render_pages(self):
-        paths_to_ignore = self.resources_to_ignore(as_regexes=True)
-        tree = Tree(paths_to_ignore)
-
-        def allow_path(path):
-            for pattern in paths_to_ignore:
-                if pattern.match(path) is not None:
-                    return False
-            return True
-
-        for root, dirs, files in os.walk(self.src):
-            if allow_path(root):
-                print('root before: {}'.format(root))
-                print('root after: {}'.format(root.replace(self.src, '')))
-                tree.add(root.replace(self.src, ''), dirs, files)
-            return tree
+        for node in self.tree.get_nodes():
+            format = self.get_format(node)
+            src_path = os.path.join(self.src, path)
+            dst_path = os.path.join(self.dst, path)
+            if format:
+                # create directory for page
+                shutil.copy(src_path, dst_path)
+                # render page
+                format.render(dst_path)
